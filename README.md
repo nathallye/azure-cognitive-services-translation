@@ -74,7 +74,7 @@
   }
   ```
   
-   4. **Criação da subscription ID:** No `Portal do Azure` vamos em `Criar um recurso(Create a resource)` em seguida buscaremos por `Cognitive Services` em seguida podemos criar clicando em `Create`.
+  5. **Criação da subscription ID:** No `Portal do Azure` vamos em `Criar um recurso(Create a resource)` em seguida buscaremos por `Cognitive Services` em seguida podemos criar clicando em `Create`.
     
   - Concluído os passos acima iremos para a tela de `Create Cognitive Services` na seção `Basics` e preencheremos os campos da forma seguinte:
 
@@ -99,19 +99,185 @@
     ![image](https://user-images.githubusercontent.com/86172286/192128224-1c156b3d-ae11-4c15-b23c-e83e56904998.png)
 
     ``` C#
-    using System;
     using Microsoft.CognitiveServices.Speech;
     using Microsoft.CognitiveServices.Speech.Audio;
+    using Microsoft.CognitiveServices.Speech.Translation;
 
-    namespace Mic
+    namespace Translate
     {
       class Program
       {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
           Console.WriteLine("Hello, girl!");
-          var config = SpeechConfig.FromSubscription("subscription_KEY 1", "subscription_Location/Region");
+
+          var speechConfig = SpeechTranslationConfig.FromSubscription("subscription_KEY 1", "subscription_Location/Region");
         }
       }
     }
     ```
+
+  6. Em seguida, iremos definir a linguagem padrão do nosso projeto:
+
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+      }
+    }
+  }
+  ```
+
+  7. A priori, iremos definir que nossa aplicação irá traduzir para um único idioma:
+  
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+        speechConfig.AddTargetLanguage("en-US");
+      }
+    }
+  }
+  ```
+
+  8. Precisamos reconhecer qual linguagem que está indo a nossa tradução, então nesse caso, uma vez que definimos a linguagem vamos trabalhar com a tradução que precisamos reconhecer/`recognizer`.
+  Para isso, vamos criar uma nova instância de `TranslationRecognizer` passando o passando o `speechConfig` que contém as informações do id subscription, da linguagem padrão e para qual idioma iremos traduzir:
+
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+        speechConfig.AddTargetLanguage("en-US");
+        var recognizer = new TranslationRecognizer(speechConfig);
+      }
+    }
+  }
+  ```
+
+  9. E para capturarmos esse resultado de forma assíncrona vamos armazenar dentro da variável `result` a promise retornada do `recognizer`:
+
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+        speechConfig.AddTargetLanguage("en-US");
+        var recognizer = new TranslationRecognizer(speechConfig);
+        var result = await recognizer.RecognizeOnceAsync(); // await é utilizado para esperar por uma Promise.
+      }
+    }
+  }
+  ```
+
+  10. Em seguida, iremos fazer uma verificação se o `result` é uma tradução de `fala`, se verdadeiro, é retornado no resultado um objeto de chave/valor,então será necessário um `forEach` para percorrer a chave e valor desse item que está dentro de `result.Translations` e exibir no console:
+
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+        speechConfig.AddTargetLanguage("en-US");
+        var recognizer = new TranslationRecognizer(speechConfig);
+        var result = await recognizer.RecognizeOnceAsync(); // await é utilizado para esperar por uma Promise.
+        if (result.Reason == ResultReason.TranslatedSpeech)
+          {
+            foreach (var item in result.Translations)
+            {
+              Console.WriteLine($"{item.Key}: {item.Value}");
+            }
+          }
+      }
+    }
+  }
+  ```
+
+  11. E para ele depois que exibir o console continue esperando "na linha" ao invés de encerrar a aplicação vamos usar o `ReadKey`:
+
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+        speechConfig.AddTargetLanguage("en-US");
+        var recognizer = new TranslationRecognizer(speechConfig);
+        var result = await recognizer.RecognizeOnceAsync(); // await é utilizado para esperar por uma Promise.
+        if (result.Reason == ResultReason.TranslatedSpeech)
+          {
+            foreach (var item in result.Translations)
+            {
+              Console.WriteLine($"{item.Key}: {item.Value}");
+            }
+          }
+        
+        Console.ReadKey();
+      }
+    }
+  }
+  ```
+
+  12. Agora, conseguimos executar nossa aplicação e testar:
+
+  
