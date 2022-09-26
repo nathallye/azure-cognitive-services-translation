@@ -1,1 +1,3 @@
-# azure-cognitive-services-translation
+# Aplicativo de tradução usando os Serviços Cognitivos da Microsoft.
+
+## 
