@@ -231,7 +231,7 @@
         speechConfig.SpeechRecognitionLanguage = "pt-br";
         speechConfig.AddTargetLanguage("en-US");
         var recognizer = new TranslationRecognizer(speechConfig);
-        var result = await recognizer.RecognizeOnceAsync(); // await é utilizado para esperar por uma Promise.
+        var result = await recognizer.RecognizeOnceAsync(); 
         if (result.Reason == ResultReason.TranslatedSpeech)
           {
             foreach (var item in result.Translations)
@@ -263,7 +263,7 @@
         speechConfig.SpeechRecognitionLanguage = "pt-br";
         speechConfig.AddTargetLanguage("en-US");
         var recognizer = new TranslationRecognizer(speechConfig);
-        var result = await recognizer.RecognizeOnceAsync(); // await é utilizado para esperar por uma Promise.
+        var result = await recognizer.RecognizeOnceAsync(); 
         if (result.Reason == ResultReason.TranslatedSpeech)
           {
             foreach (var item in result.Translations)
@@ -281,5 +281,42 @@
   12. Agora, conseguimos executar nossa aplicação e testar:
   
    ![image](https://user-images.githubusercontent.com/86172286/192175943-730b86a3-dd37-49cb-9938-f85039854ad8.png)
+
+  13. Para configurarmos a tradução para mais de um idioma vamos criar uma lista/array de idiomas/`lang`, em seguida, iremos aplicar o método `ForEach` "em cima" desse array e adicionar cada item/cada language dentro do `speechConfig.AddTargetLanguage`:
+
+  ``` C#
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+
+        var speechConfig = SpeechTranslationConfig.FromSubscription("eb5677582e83409cadbbd7a191f382f7", "brazilsouth");
+        speechConfig.SpeechRecognitionLanguage = "pt-br";
+        // speechConfig.AddTargetLanguage("en-US");
+        var lang = new List<string>() { "en-US", "fr-FR", "es-AR" };
+        lang.ForEach(speechConfig.AddTargetLanguage);
+        
+        var recognizer = new TranslationRecognizer(speechConfig);
+        var result = await recognizer.RecognizeOnceAsync(); 
+        if (result.Reason == ResultReason.TranslatedSpeech)
+          {
+            foreach (var item in result.Translations)
+            {
+              Console.WriteLine($"{item.Key}: {item.Value}");
+            }
+          }
+        
+        Console.ReadKey();
+      }
+    }
+  }
+  ```
 
   
