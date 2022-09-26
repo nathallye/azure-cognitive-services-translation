@@ -40,12 +40,33 @@
   using System;
   using Microsoft.CognitiveServices.Speech;
   using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
 
-  namespace Mic
+  namespace Translate
   {
     class Program
     {
       static void Main(string[] args)
+      {
+        Console.WriteLine("Hello, girl!");
+      }
+    }
+  }
+  ```
+
+  4. Vamos mudar o método de `static void Main` para `static assyn Task Main` para trabalharmos com os métodos assíncronos da biblioteca `CognitiveServices`:
+
+  ``` C#
+  using System;
+  using Microsoft.CognitiveServices.Speech;
+  using Microsoft.CognitiveServices.Speech.Audio;
+  using Microsoft.CognitiveServices.Speech.Translation;
+
+  namespace Translate
+  {
+    class Program
+    {
+      static async Task Main(string[] args)
       {
         Console.WriteLine("Hello, girl!");
       }
